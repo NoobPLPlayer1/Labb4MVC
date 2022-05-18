@@ -1,0 +1,68 @@
+﻿@model IEnumerable<Labb4MVC.Models.Book>
+
+@{
+    ViewData["Title"] = "Books";
+    LendPeriod? currentLender;
+}
+
+<h1>Books</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.BookType.ISBN)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.BookType.Title)
+            </th>
+            <th>
+                Lend Status
+            </th>
+            <th>
+                Until
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Status)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookType.ISBN)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookType.Title)
+            </td>
+            @if ((currentLender = item.LentTo.FirstOrDefault(l => l.Start <= DateTime.Now && l.End >= DateTime.Now)) is not null)
+            {        
+                <td>
+                    @Html.DisplayFor(modelItem => currentLender.Customer.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => currentLender.End)
+                </td>
+            }
+            else
+            {
+                <td>
+                    @(item.LentTo.LastOrDefault(l => l.End < DateTime.Now)?.HasBook ?? false ? "Not returned" : "Available")
+                </td>
+                <td>
+
+                </td>
+            }
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                <a asp-action="LendBook" asp-route-id="@item.ID">Lend</a> |
+                <a asp-action="DeleteBook" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

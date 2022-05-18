@@ -1,0 +1,38 @@
+﻿@model IEnumerable<Labb4MVC.Models.LendPeriod>
+
+@{
+    ViewData["Title"] = "LendingPeriods";
+}
+
+<h1>LendingPeriods</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.HasBook)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Start)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Days)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.HasBook)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Start)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Days)
+            </td>
+        </tr>
+}
+    </tbody>
+</table>
