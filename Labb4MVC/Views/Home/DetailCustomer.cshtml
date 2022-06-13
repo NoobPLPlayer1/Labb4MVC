@@ -70,6 +70,8 @@
             <th>
                 End
             </th>
+            <th>
+            </th>
         </tr>
     </thead>
     <tbody>
@@ -86,6 +88,24 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.End)
+            </td>
+            
+            <td>
+                    @{
+                        
+                        if(item.HasBook)
+                        {
+                            <a asp-action="ReturnBook" asp-route-id="@item.ID">Return</a>
+                        }
+                        else if(!item.HasBook && item.Start <= DateTime.Now && item.End >= DateTime.Now)
+                        {
+                            <a asp-action="TakeBook" asp-route-id="@item.ID">Take</a>
+                        }
+                    } 
+                
+            </td>
+            <td>
+                    <a asp-action="DeleteLendingPeriod" asp-route-id="@item.ID">Delete</a>
             </td>
         </tr>
 }

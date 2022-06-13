@@ -31,7 +31,7 @@ namespace Labb4MVC.Controllers
                 period.HasBook = true;
                 repository.Update(period);
             }
-            return Redirect("../CustomerBooks");
+            return RedirectToAction("DetailCustomer", period.Customer);
         }
         public IActionResult ReturnBook(int id)
         {
@@ -40,7 +40,7 @@ namespace Labb4MVC.Controllers
                 period.HasBook = false;
                 repository.Update(period);
             }
-            return Redirect("../CustomerBooks");
+            return RedirectToAction("DetailCustomer", period.Customer);
         }
     }
 }
