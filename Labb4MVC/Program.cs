@@ -1,9 +1,14 @@
+using Labb4MVC;
+using Labb4MVC.Repositories;
+
+BookDbContext dbContext = new();
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddSession();
+builder.Services.AddScoped<ICompleteRepository>(s => new CompleteRepository(dbContext));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -8,38 +8,35 @@ namespace Labb4MVC.Controllers
         {
             return View(new BookType());
         }
-        public IActionResult EditBookType(string value)
+        public IActionResult EditBookType(string isbn)
         {
-            var type = bookDb.BookTypes.Where(c => c.ISBN == value).FirstOrDefault();
-            if (type is null)
+            if (!repository.GetByISBN(isbn, out var type))
                 return Redirect("BookTypes");
             return View(type);
         }
 
-        public IActionResult FinishEditCustomer(Customer customer)
+        public IActionResult FinishEditBookType(BookType type)
         {
-            bookDb.Update(customer);
-            bookDb.SaveChanges();
-            return Redirect("Customers");
+            repository.Update(type);
+            return Redirect("BookTypes");
         }
 
         public IActionResult SubmitBookType(BookType type)
         {
-            bookDb.BookTypes.Add(type);
-            bookDb.SaveChanges();
+            repository.Add(type);
             return Redirect("BookTypes");
         }
         public IActionResult DeleteBookType(BookType type)
         {
-            bookDb.Remove(type);
-            bookDb.SaveChanges();
-            return Redirect("../BookTypes");
+            repository.GetByISBN(type.ISBN, out var bookType);
+            repository.Remove(bookType);
+            return Redirect("BookTypes");
         }
 
         public IActionResult BookTypes()
         {
-            bookDb.SaveChanges();
-            return View(bookDb.BookTypes);
+            repository.GetAll(out IQueryable<BookType> types);
+            return View(types);
         }
     }
 }

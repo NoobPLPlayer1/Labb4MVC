@@ -7,43 +7,45 @@ namespace Labb4MVC.Controllers
     public partial class HomeController
     {
 
+
+
         public IActionResult Books()
         {
-            bookDb.SaveChanges();
-            return View(bookDb.Books.Include(i => i.BookType).Include(i => i.LentTo).ThenInclude(c => c.Customer));
+            if(repository.GetAll(out IQueryable<Book> books))
+                return View(books.Include(i => i.BookType).Include(i => i.LentTo).ThenInclude(c => c.Customer));
+            return View();
         }
 
         public IActionResult CreateBookOfType(string isbn)
         {
-            var bookType = bookDb.BookTypes.Where(c => c.ISBN == isbn).FirstOrDefault();
+            repository.GetByISBN(isbn, out var bookType);
             var book = new Book();
             book.BookType = bookType;
             book.Status = "New";
-            bookDb.Books.Add(book);
-            bookDb.SaveChanges();
+            repository.Add(book);
             return Redirect("BookTypes");
         }
 
         public IActionResult DeleteBook(int id)
         {
-            var myBook = (from book in bookDb.Books where book.ID == id select book).FirstOrDefault();
+            repository.GetByID(id, out Book myBook);
             if (myBook is null)
                 return Redirect("../Books");
-            bookDb.Books.Remove(myBook);
-            bookDb.SaveChanges();
+            repository.Remove(myBook);
             return Redirect("../Books");
         }
 
         public IActionResult LendBook(int id)
         {
-            var myBook = (from book in bookDb.Books where book.ID == id select book).Include(b => b.LentTo).FirstOrDefault();
+            repository.Get(b => b.ID == id, out IQueryable<Book> books);
+            var myBook = books.Include(b => b.LentTo).FirstOrDefault();
             if (myBook is null)
                 return Redirect("../Books");
 
             string? str = HttpContext.Session.GetString("login");
             if (str is null || !int.TryParse(str, out id))
                 return Redirect("../Books");
-            var myCustomer = (from customer in bookDb.Customers where customer.ID == id select customer).FirstOrDefault();
+            repository.GetByID(id, out Customer myCustomer);
             if (myCustomer is null)
                 return Redirect("../Books");
 
@@ -56,23 +58,28 @@ namespace Labb4MVC.Controllers
 
         public IActionResult SubmitLendBook(LendPeriod lendPeriod, int customer, int book)
         {
-            var myCustomer = (from c in bookDb.Customers where c.ID == customer select c).FirstOrDefault();
-            var myBook = (from b in bookDb.Books where b.ID == book select b).Include(b => b.LentTo).FirstOrDefault();
+            repository.GetByID(customer, out Customer myCustomer);
+            repository.GetByID(book, out Book myBook);
             lendPeriod.Customer = myCustomer;
             lendPeriod.Book = myBook;
-            bookDb.Add(lendPeriod);
-            bookDb.SaveChanges();
+            lendPeriod.BookID = myBook.ID;
+            repository.Add(lendPeriod);
             return Redirect("Books");
         }
 
         public IActionResult LendingPeriods(int id)
         {
-            var myBook = (from book in bookDb.Books where book.ID == id select book).FirstOrDefault();
+            repository.GetAll(out IQueryable<LendPeriod> lendingPeriod);
+            return View(lendingPeriod.Where(l => l.Customer.ID == id));
+        }
+
+        public IActionResult DeleteLendingPeriod(int id)
+        {
+            repository.GetByID(id, out LendPeriod myBook);
             if (myBook is null)
-                return Redirect("../Books");
-            bookDb.Books.Remove(myBook);
-            bookDb.SaveChanges();
-            return Redirect("../Books");
+                return Redirect("..");
+            repository.Remove(myBook);
+            return Redirect("..");
         }
     }
 }

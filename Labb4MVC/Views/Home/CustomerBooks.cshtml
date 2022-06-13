@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Labb4MVC.Models.Book>
+﻿@model Labb4MVC.ViewModel.CustomerBooks
 
 @{
     ViewData["Title"] = "Books";
@@ -7,14 +7,16 @@
 
 <h1>Books</h1>
 
+<p>
+<a asp-action="LendingPeriods" asp-route-id="@Model.Customer">Show Periods</a></p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.BookType.ISBN) 
+                BookType
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.BookType.Title)
+                Book Type
             </th>
             <th>
                 Lend Status
@@ -23,13 +25,14 @@
                 Until
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Status)
+                Status
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+@foreach (var item in Model.Books) 
+{
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.BookType.ISBN)
@@ -59,7 +62,22 @@
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
             <td>
-                <a asp-action="LendBook" asp-route-id="@item.ID">Lend</a>
+                    @{
+                        var returns = item.LentTo.Where(l => l.HasBook);
+                        var takes = item.LentTo.Where(l => !l.HasBook);
+                        var currentReturn = returns.FirstOrDefault(l => l.Customer.ID == Model.Customer);
+                        var currentTake = takes.FirstOrDefault(l => l.Start <= DateTime.Now && l.End >= DateTime.Now && l.Customer.ID == Model.Customer);
+                        
+                        if(currentReturn is not null)
+                        {
+                            <a asp-action="ReturnBook" asp-route-id="@currentReturn.ID">Return</a>
+                        }
+                        else if(currentTake is not null)
+                        {
+                            <a asp-action="TakeBook" asp-route-id="@currentTake.ID">Take</a>
+                        }
+                    }
+                
             </td>
         </tr>
 }

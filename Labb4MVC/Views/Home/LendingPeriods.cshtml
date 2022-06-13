@@ -32,6 +32,9 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Days)
             </td>
+            <td>
+                <a asp-action="DeleteLendingPeriod" asp-route-id="@item.ID">Delete</a>
+            </td>
         </tr>
 }
     </tbody>

@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 
 namespace Labb4MVC.Models;
-public class Customer
+public class Customer : IIdentifiableInt
 {
     [Key] public int ID { get; init; }
     public string Name { get; set; }

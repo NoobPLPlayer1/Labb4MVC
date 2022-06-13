@@ -1,4 +1,5 @@
 ﻿using Labb4MVC.Models;
+using Labb4MVC.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -7,12 +8,12 @@ namespace Labb4MVC.Controllers
     public partial class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly BookDbContext bookDb = new();
+        private readonly ICompleteRepository repository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ICompleteRepository repository)
         {
             _logger = logger;
-
+            this.repository = repository;
         }
 
         public IActionResult Index()

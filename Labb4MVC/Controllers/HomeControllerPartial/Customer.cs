@@ -9,8 +9,8 @@ namespace Labb4MVC.Controllers
     {
         public IActionResult Customers()
         {
-            bookDb.SaveChanges();
-            return View(bookDb.Customers);
+            repository.GetAll(out IQueryable<Customer> customers);
+            return View(customers);
         }
 
         public IActionResult CreateCustomer()
@@ -20,28 +20,32 @@ namespace Labb4MVC.Controllers
 
         public IActionResult SubmitCustomer(Customer customer)
         {
-            bookDb.Add(customer);
-            bookDb.SaveChanges();
+            repository.Add(customer);
             return Redirect("Customers");
         }
         public IActionResult DeleteCustomer(Customer customer)
         {
-            bookDb.Remove(customer);
-            bookDb.SaveChanges();
+            repository.Remove(customer);
             return Redirect("../Customers");
         }
 
         public IActionResult EditCustomer(int id)
         {
-            var customer = bookDb.Customers.Where(c => c.ID == id).FirstOrDefault();
-            if (customer is null)
+            if (!repository.GetByID(id, out Customer customer))
                 return Redirect("Customers");
             return View(customer);
         }
 
+        public IActionResult FinishEditCustomer(Customer customer)
+        {
+            repository.Update(customer);
+            return Redirect("Customers");
+        }
+
         public IActionResult DetailCustomer(int id)
         {
-            var customer = bookDb.Customers.Where(c => c.ID == id).Include(i => i.Lending).ThenInclude(i => i.Book).ThenInclude(i => i.BookType).FirstOrDefault();
+            repository.GetAll(out IQueryable<Customer> customers);
+            var customer = customers.Where(c => c.ID == id).Include(i => i.Lending).ThenInclude(i => i.Book).ThenInclude(i => i.BookType).FirstOrDefault();
             if (customer is null)
                 return Redirect("Customers");
             return View(customer);
@@ -49,8 +53,7 @@ namespace Labb4MVC.Controllers
 
         public IActionResult SubmitEditCustomer(Customer customer)
         {
-            bookDb.Update(customer);
-            bookDb.SaveChanges();
+            repository.Update(customer);
             return Redirect("Customers");
         }
 
